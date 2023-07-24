@@ -1,3 +1,6 @@
+import DataLoader from 'dataloader';
+import { FastifyInstance } from 'fastify';
+
 export interface InputCreatePost {
   title: string;
   content: string;
