@@ -1,6 +1,6 @@
 import { FastifyInstance } from 'fastify';
 
-export const batchProfiles = async (userIds: string[], fastify: FastifyInstance) => {
+export const loaderProfiles = async (userIds: string[], fastify: FastifyInstance) => {
   const profiles = await fastify.prisma.profile.findMany({
     where: { userId: { in: userIds } },
     include: { memberType: true },
@@ -9,7 +9,7 @@ export const batchProfiles = async (userIds: string[], fastify: FastifyInstance)
   return userIds.map((userId) => profileMap.get(userId));
 };
 
-export const batchMemberTypes = async (
+export const loaderMemberTypes = async (
   memberTypeIds: string[],
   fastify: FastifyInstance,
 ) => {
@@ -22,7 +22,7 @@ export const batchMemberTypes = async (
   return memberTypeIds.map((memberTypeId) => memberTypeMap.get(memberTypeId));
 };
 
-export const batchUserPosts = async (userIds: string[], fastify: FastifyInstance) => {
+export const loaderUserPosts = async (userIds: string[], fastify: FastifyInstance) => {
   const posts = await fastify.prisma.post.findMany({
     where: { authorId: { in: userIds } },
   });
@@ -32,7 +32,10 @@ export const batchUserPosts = async (userIds: string[], fastify: FastifyInstance
   return postsByAuthor;
 };
 
-export const batchUserRelations = async (userIds: string[], fastify: FastifyInstance) => {
+export const loaderUserRelations = async (
+  userIds: string[],
+  fastify: FastifyInstance,
+) => {
   const subscriptionsOnAuthor = await fastify.prisma.subscribersOnAuthors.findMany({
     where: { subscriberId: { in: userIds } },
     include: { author: true },

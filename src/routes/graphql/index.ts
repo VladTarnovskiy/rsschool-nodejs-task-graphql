@@ -5,10 +5,10 @@ import { GraphQLError, graphql, parse, validate } from 'graphql';
 import { graphqlSchema } from './schemas.js';
 import DataLoader from 'dataloader';
 import {
-  batchMemberTypes,
-  batchProfiles,
-  batchUserPosts,
-  batchUserRelations,
+  loaderMemberTypes,
+  loaderProfiles,
+  loaderUserPosts,
+  loaderUserRelations,
 } from './dataLoaders.js';
 
 const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
@@ -34,16 +34,16 @@ const plugin: FastifyPluginAsyncTypebox = async (fastify) => {
 
         const dataLoaders = {
           profileLoader: new DataLoader((userIds) =>
-            batchProfiles(userIds as string[], fastify),
+            loaderProfiles(userIds as string[], fastify),
           ),
           userPostsLoader: new DataLoader((userIds) =>
-            batchUserPosts(userIds as string[], fastify),
+            loaderUserPosts(userIds as string[], fastify),
           ),
           userRelationsLoader: new DataLoader((userIds) =>
-            batchUserRelations(userIds as string[], fastify),
+            loaderUserRelations(userIds as string[], fastify),
           ),
           memberTypeLoader: new DataLoader((memberTypeIds) =>
-            batchMemberTypes(memberTypeIds as string[], fastify),
+            loaderMemberTypes(memberTypeIds as string[], fastify),
           ),
         };
 
