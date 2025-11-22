@@ -1,107 +1,84 @@
-import { GraphQLObjectType, GraphQLNonNull, GraphQLList, GraphQLError } from 'graphql';
-import { MemberType, MemberTypeIdEnum } from './member.js';
+import { GraphQLObjectType, GraphQLNonNull, GraphQLList } from 'graphql';
+import { MemberTypeIdEnum } from './member.js';
 import { UUIDType } from './uuid.js';
 import { PrismaClient } from '@prisma/client';
-import { PostType } from './post.js';
-import { ProfileType } from './profile.js';
-import { UserType } from './user.js';
 
-export const RootQueryType = (prisma: PrismaClient) => {
+export const RootQueryType = (
+  prisma: PrismaClient,
+  userType: GraphQLObjectType,
+  profileType: GraphQLObjectType,
+  postType: GraphQLObjectType,
+  memberType: GraphQLObjectType,
+) => {
   return new GraphQLObjectType({
     name: 'RootQueryType',
     fields: () => ({
       memberTypes: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(MemberType))),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(memberType))),
         resolve: async () => {
-          return prisma.memberType.findMany();
+          return await prisma.memberType.findMany();
         },
       },
       memberType: {
-        type: MemberType,
+        type: memberType,
         args: {
           id: { type: new GraphQLNonNull(MemberTypeIdEnum) },
         },
         resolve: async (_: unknown, args: { id: string }) => {
-          const memberType = await prisma.memberType.findUnique({
+          return await prisma.memberType.findUnique({
             where: { id: args.id },
           });
-          if (memberType === null) {
-            throw new GraphQLError('MemberType not found', {
-              extensions: { code: 'NOT_FOUND' },
-            });
-          }
-          return memberType;
         },
       },
       users: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType(prisma)))),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(userType))),
         resolve: async () => {
-          return prisma.user.findMany();
+          return await prisma.user.findMany();
         },
       },
       user: {
-        type: UserType(prisma) as GraphQLObjectType,
+        type: userType,
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
         },
         resolve: async (_: unknown, args: { id: string }) => {
-          const user = await prisma.user.findUnique({
+          return await prisma.user.findUnique({
             where: { id: args.id },
           });
-          if (user === null) {
-            throw new GraphQLError('User not found', {
-              extensions: { code: 'NOT_FOUND' },
-            });
-          }
-          return user;
         },
       },
       posts: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(postType))),
         resolve: async () => {
-          return prisma.post.findMany();
+          return await prisma.post.findMany();
         },
       },
       post: {
-        type: PostType,
+        type: postType,
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
         },
         resolve: async (_: unknown, args: { id: string }) => {
-          const post = await prisma.post.findUnique({
+          return await prisma.post.findUnique({
             where: { id: args.id },
           });
-          if (post === null) {
-            throw new GraphQLError('Post not found', {
-              extensions: { code: 'NOT_FOUND' },
-            });
-          }
-          return post;
         },
       },
       profiles: {
-        type: new GraphQLNonNull(
-          new GraphQLList(new GraphQLNonNull(ProfileType(prisma))),
-        ),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(profileType))),
         resolve: async () => {
-          return prisma.profile.findMany();
+          return await prisma.profile.findMany();
         },
       },
       profile: {
-        type: ProfileType(prisma),
+        type: profileType,
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
         },
         resolve: async (_: unknown, args: { id: string }) => {
-          const profile = await prisma.profile.findUnique({
+          return await prisma.profile.findUnique({
             where: { id: args.id },
           });
-          if (profile === null) {
-            throw new GraphQLError('Profile not found', {
-              extensions: { code: 'NOT_FOUND' },
-            });
-          }
-          return profile;
         },
       },
     }),

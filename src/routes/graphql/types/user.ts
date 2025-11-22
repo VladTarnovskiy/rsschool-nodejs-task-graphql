@@ -6,13 +6,15 @@ import {
   GraphQLObjectType,
   GraphQLString,
 } from 'graphql';
-import { ProfileType } from './profile.js';
-import { PostType } from './post.js';
 import { UUIDType } from './uuid.js';
 import { PrismaClient } from '@prisma/client';
 
-export const UserType = (prisma: PrismaClient) => {
-  return new GraphQLObjectType({
+export const UserType = (
+  prisma: PrismaClient,
+  profileType: GraphQLObjectType,
+  postType: GraphQLObjectType,
+) => {
+  const userType = new GraphQLObjectType({
     name: 'User',
     fields: () => ({
       id: {
@@ -25,7 +27,7 @@ export const UserType = (prisma: PrismaClient) => {
         type: new GraphQLNonNull(GraphQLFloat),
       },
       profile: {
-        type: ProfileType(prisma),
+        type: profileType,
         resolve: async (parent: { id: string }) => {
           return prisma.profile.findUnique({
             where: { userId: parent.id },
@@ -33,7 +35,7 @@ export const UserType = (prisma: PrismaClient) => {
         },
       },
       posts: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(PostType))),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(postType))),
         resolve: async (parent: { id: string }) => {
           return prisma.post.findMany({
             where: { authorId: parent.id },
@@ -41,7 +43,7 @@ export const UserType = (prisma: PrismaClient) => {
         },
       },
       userSubscribedTo: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType(prisma)))),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(userType))),
         resolve: async (parent: { id: string }) => {
           return prisma.user.findMany({
             where: {
@@ -55,7 +57,7 @@ export const UserType = (prisma: PrismaClient) => {
         },
       },
       subscribedToUser: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType(prisma)))),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(userType))),
         resolve: async (parent: { id: string }) => {
           return prisma.user.findMany({
             where: {
@@ -70,6 +72,8 @@ export const UserType = (prisma: PrismaClient) => {
       },
     }),
   });
+
+  return userType as GraphQLObjectType;
 };
 
 export const CreateUserInput = new GraphQLInputObjectType({

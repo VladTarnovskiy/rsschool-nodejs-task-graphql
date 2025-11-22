@@ -9,7 +9,7 @@ import { MemberType, MemberTypeIdEnum } from './member.js';
 import { UUIDType } from './uuid.js';
 import { PrismaClient } from '@prisma/client';
 
-export const ProfileType = (prisma: PrismaClient) => {
+export const ProfileType = (prisma: PrismaClient, memberType: GraphQLObjectType) => {
   return new GraphQLObjectType({
     name: 'Profile',
     fields: () => ({
@@ -23,7 +23,7 @@ export const ProfileType = (prisma: PrismaClient) => {
         type: new GraphQLNonNull(GraphQLInt),
       },
       memberType: {
-        type: new GraphQLNonNull(MemberType),
+        type: new GraphQLNonNull(memberType),
         resolve: async (parent: { memberTypeId: string }) => {
           return prisma.memberType.findUnique({
             where: { id: parent.memberTypeId },
