@@ -25,7 +25,7 @@ export const UserType = (prisma: PrismaClient) => {
         type: new GraphQLNonNull(GraphQLFloat),
       },
       profile: {
-        type: ProfileType,
+        type: ProfileType(prisma),
         resolve: async (parent: { id: string }) => {
           return prisma.profile.findUnique({
             where: { userId: parent.id },
