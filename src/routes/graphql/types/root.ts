@@ -34,13 +34,13 @@ export const RootQueryType = (prisma: PrismaClient) => {
         },
       },
       users: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType))),
+        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(UserType(prisma)))),
         resolve: async () => {
           return prisma.user.findMany();
         },
       },
       user: {
-        type: UserType as GraphQLObjectType,
+        type: UserType(prisma) as GraphQLObjectType,
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
         },
@@ -80,13 +80,15 @@ export const RootQueryType = (prisma: PrismaClient) => {
         },
       },
       profiles: {
-        type: new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(ProfileType))),
+        type: new GraphQLNonNull(
+          new GraphQLList(new GraphQLNonNull(ProfileType(prisma))),
+        ),
         resolve: async () => {
           return prisma.profile.findMany();
         },
       },
       profile: {
-        type: ProfileType,
+        type: ProfileType(prisma),
         args: {
           id: { type: new GraphQLNonNull(UUIDType) },
         },
