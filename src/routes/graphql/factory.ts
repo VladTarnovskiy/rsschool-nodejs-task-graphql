@@ -9,8 +9,8 @@ import { Mutations } from './mutation/mutation.js';
 export const createSchema = (prisma: PrismaClient) => {
   const memberType = MemberType;
   const postType = PostType;
-  const profileType = ProfileType(prisma, memberType);
-  const userType = UserType(prisma, profileType, postType);
+  const profileType = ProfileType(memberType);
+  const userType = UserType(profileType, postType);
 
   const rootQueryType = RootQueryType(
     prisma,

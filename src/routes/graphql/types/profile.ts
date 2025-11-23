@@ -7,9 +7,14 @@ import {
 } from 'graphql';
 import { MemberType, MemberTypeIdEnum } from './member.js';
 import { UUIDType } from './uuid.js';
-import { PrismaClient } from '@prisma/client';
 
-export const ProfileType = (prisma: PrismaClient, memberType: GraphQLObjectType) => {
+type Loaders = {
+  memberTypesByIdLoader: ReturnType<
+    typeof import('../loaders.js').createLoaders
+  >['memberTypesByIdLoader'];
+};
+
+export const ProfileType = (memberType: GraphQLObjectType) => {
   return new GraphQLObjectType({
     name: 'Profile',
     fields: () => ({
@@ -24,10 +29,12 @@ export const ProfileType = (prisma: PrismaClient, memberType: GraphQLObjectType)
       },
       memberType: {
         type: new GraphQLNonNull(memberType),
-        resolve: async (parent: { memberTypeId: string }) => {
-          return prisma.memberType.findUnique({
-            where: { id: parent.memberTypeId },
-          });
+        resolve: async (
+          parent: { memberTypeId: string },
+          _: unknown,
+          context: { loaders: Loaders },
+        ) => {
+          return context.loaders.memberTypesByIdLoader.load(parent.memberTypeId);
         },
       },
     }),
